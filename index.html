@@ -255,6 +255,18 @@ select:focus{border-color:var(--accent)}
 .card:hover .media img,.card:hover .media video{transform:scale(1.04)}
 .media-error{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#4a526a;font-size:11px;background:repeating-linear-gradient(45deg,#0b0e15,#0b0e15 8px,#10141d 8px,#10141d 16px)}
 
+/* Video cards: poster only, video loads on click */
+.play-badge{
+  position:absolute;right:10px;bottom:10px;z-index:3;
+  width:34px;height:34px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.55);color:#fff;
+  border:1px solid rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  pointer-events:none;transition:transform .25s ease,background .25s ease
+}
+.card:hover .play-badge{transform:scale(1.08);background:rgba(0,0,0,.72)}
+
 /* === PLACEHOLDER (concept art when no preview) === */
 .ph-art{
   position:absolute;inset:0;
