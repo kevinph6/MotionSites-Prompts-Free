@@ -380,6 +380,17 @@ function lazyMediaOf(x) {
   if (looksVideo && (k === 'mp4' || k === 'webm' || k === 'other')) kind = 'video';
   else if (looksImage || k === 'webp' || k === 'gif' || k === 'png' || k === 'jpeg') kind = 'image';
   else if (k === 'mp4' || k === 'webm') kind = 'video';
+  // __MS_PATCH_APPLIED__: video-click-to-load-2026-11-15
+  // Videos are NOT loaded in the grid. Each video card renders the generated
+  // poster art plus a play badge, and no <video> element is created until the
+  // card is opened (the modal loads and plays it). This keeps the grid light:
+  // 181 videos x ~6 MB would otherwise be fetched and decoded on scroll.
+  if (kind === 'video') {
+    return '<div class="media media-poster" data-kind="video-poster">' + ph
+      + '<span class="play-badge" aria-hidden="true">'
+      + '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'
+      + '</span></div>';
+  }
   return '<div class="media" data-armed="1" data-kind="' + kind + '" data-src="' + esc(src) + '" data-title="' + title + '">' + ph + '</div>';
 }
 
@@ -750,9 +761,16 @@ function metaPanelHTML(x) {
 
 function closeModal() {
   try { $('dlg').close(); } catch (e) {}
-  // pause any playing video
+  // __MS_PATCH_APPLIED__: free-video-on-close-2026-11-15
+  // Pause AND remove the video so its decoded frames and buffer are released.
+  // Previously the element stayed in the DOM after closing, so every video you
+  // opened kept its memory until the next one replaced it.
   const v = $('preview').querySelector('video');
-  if (v) try { v.pause(); } catch (e) {}
+  if (v) {
+    try { v.pause(); } catch (e) {}
+    try { v.removeAttribute('src'); v.load(); } catch (e) {}
+    v.remove();
+  }
 }
 
 $('copy').addEventListener('click', async () => {
