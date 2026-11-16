@@ -353,7 +353,7 @@ function onImgError(e) {
 
 function mediaOf(x, forPreview) {
   // forPreview=true is the detail modal; load immediately
-  if (x.local_kind === 'mp4') return '<video src="' + esc(x.local_rel) + '" ' + (forPreview ? 'controls ' : '') + 'autoplay loop muted playsinline preload="metadata"></video>';
+  if (x.local_kind === 'mp4') return '<video src="' + esc(x.local_rel) + '" ' + (forPreview ? 'controls ' : '') + 'autoplay loop muted playsinline preload="auto"></video>';
   if (x.local_kind === 'hls') return placeholderHTML(x, { big: forPreview });
   if (x.local_kind === 'webp' || x.local_kind === 'gif' || x.local_kind === 'png' || x.local_kind === 'jpeg') {
     return '<img src="' + esc(x.local_rel) + '" alt="' + esc(x.title) + '" loading="lazy" decoding="async">';
@@ -709,6 +709,17 @@ async function openItem(id) {
   $('copy').disabled = true;
   $('download').disabled = true;
   try { $('dlg').showModal(); } catch (e) { /* not in secure context */ }
+
+  // __MS_PATCH_APPLIED__: modal-video-play-2026-11-16
+  // The <video> is inserted into #preview while the <dialog> is still hidden,
+  // so the browser can skip autoplay entirely. Kick it explicitly once the
+  // dialog is actually visible.
+  const pv = $('preview').querySelector('video');
+  if (pv) {
+    pv.muted = true;
+    const pp = pv.play();
+    if (pp && typeof pp.catch === 'function') pp.catch(function () {});
+  }
 
   // Lazy-load the prompt body only when the modal opens
   let body = current.prompt_text;
