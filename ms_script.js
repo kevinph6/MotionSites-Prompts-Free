@@ -386,7 +386,8 @@ function lazyMediaOf(x) {
   // card is opened (the modal loads and plays it). This keeps the grid light:
   // 181 videos x ~6 MB would otherwise be fetched and decoded on scroll.
   if (kind === 'video') {
-    return '<div class="media media-poster" data-kind="video-poster">' + ph
+    return '<div class="media media-poster" data-kind="video-poster">'
+      + '<img class="poster-img" src="assets/posters/' + esc(x.id) + '.jpg" alt="" loading="lazy" decoding="async">'
       + '<span class="play-badge" aria-hidden="true">'
       + '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'
       + '</span></div>';
